@@ -2,18 +2,19 @@ var city;
 var searchedCities =[];
 var coord;
 var key="&appid=699b48e686b0ad4a16a412dc0fed1a03";
-
+//separate formhandler function from get forcast function to avoid the preventdefault error when we click on search history btns
 var formHandler =function(event){
     event.preventDefault();
     city =$("#city").val().trim();
     GetForcast();
 }
+//get current forcast
  var GetForcast = function(){   
    var apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=";
    var response = fetch(apiUrl +city +"&units=imperial" +key).then(function(response){
        if (response.ok) {
             response.json().then(function(data){
-                
+                // format timestamp 
                 var todayDate=new Date( Date(data.dt));console.log(data);
                 var formatedDate = "("+todayDate.getMonth()+'/' +todayDate.getDate()+'/'+todayDate.getFullYear()+")";
                 $(".searched-city").text(city +" "+formatedDate);
@@ -26,10 +27,10 @@ var formHandler =function(event){
                 $(".today").find(".humidity").text(todayHumidity);
                 coord=data.coord;
                 $("#city").val("");
-            GetTodayUV();
-            fiveDayForcast();
-            $("#forcast").removeClass("d-none");
-            saveCities();
+                $("#forcast").removeClass("d-none");
+                GetTodayUV();
+                fiveDayForcast();
+                saveCities();
             }); 
        }
         else{
@@ -42,7 +43,7 @@ var formHandler =function(event){
     });
 }
 var GetTodayUV = function(){
-    
+    // got the coord as an array from getforcast function
     var apiUrl ="https://api.openweathermap.org/data/2.5/onecall?lat="
     var response = fetch(apiUrl+coord.lat+"&lon="+coord.lon+"&units=imperial" +key).then(function(response){
        if (response.ok) {
@@ -67,7 +68,7 @@ var GetTodayUV = function(){
        }); 
        }
        else{
-           alert("");
+           alert("A problem occurred");
        }
     })
     .catch(function(error){
@@ -95,7 +96,7 @@ var fiveDayForcast=function(){
          }); 
          }
          else{
-             alert("");
+             alert("A problem occurred");
          }
     })
       .catch(function(error){
@@ -106,23 +107,28 @@ var fiveDayForcast=function(){
 
 var saveCities =function (){
    //result =searchedCities.find(element =>city);
+   //verify that the city is not searched before to not add dupp
        if (!searchedCities.includes(city)) {
            searchedCities.push(city);
-           var btnEl = $("<button>").addClass("btn btn-outline-secondary fs-5 w-100 my-3 text-capitalize").text(city);
+           //display the new searched city
+           var btnEl = $("<button>").addClass("btn btn-outline-secondary fs-5 w-100 mt-3 text-capitalize").text(city);
            $("#saved-cities").removeClass("d-none");
            $("#saved-cities").append(btnEl);
            
         }
+        //save cities in localstorage
+        //use json.stringify to save an array not a string
     localStorage.setItem("cities",JSON.stringify(searchedCities));
     
 }
 var getCities = function(){
     searchedCities = JSON.parse(localStorage.getItem("cities"));
-    
+    //initialize the array if it returns null
     if (!searchedCities) {
         searchedCities = [];
     }
     else{
+        //remove display none class and load saved cities from localstorage
         $("#saved-cities").removeClass("d-none");
         for (let i = 0; i < searchedCities.length; i++) {
             var btnEl = $("<button>").addClass("btn btn-outline-secondary fs-5 w-100 mt-3 text-capitalize").text(searchedCities[i]);
@@ -130,7 +136,7 @@ var getCities = function(){
             
         }
     }
-    //console.log(arr);
+    
 }
 getCities();
 $("#forcast-form").on("submit",formHandler);
