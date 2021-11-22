@@ -125,7 +125,7 @@ var getCities = function(){
     else{
         $("#saved-cities").removeClass("d-none");
         for (let i = 0; i < searchedCities.length; i++) {
-            var btnEl = $("<button>").addClass("btn btn-outline-secondary fs-5 w-100 my-3 text-capitalize").text(searchedCities[i]);
+            var btnEl = $("<button>").addClass("btn btn-outline-secondary fs-5 w-100 mt-3 text-capitalize").text(searchedCities[i]);
             $("#saved-cities").append(btnEl);
             
         }
@@ -133,7 +133,7 @@ var getCities = function(){
     //console.log(arr);
 }
 getCities();
-document.querySelector("#forcast-form").addEventListener("submit",formHandler);
+$("#forcast-form").on("submit",formHandler);
 $("#saved-cities").on("click","button",function(){
     city = $(this).text().trim();
     GetForcast();
