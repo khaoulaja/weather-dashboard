@@ -16,15 +16,15 @@ var GetTodayForcast = function(event){
               var formatedDate = "("+todayDate.getMonth()+'/' +todayDate.getDate()+'/'+todayDate.getFullYear()+")";
               console.log(formatedDate); 
               $(".searched-city").text(city +" "+formatedDate);
+              $(".today").find(".icon").attr("src","https://openweathermap.org/img/wn/"+data.weather[0].icon+".png")
               var todayTemp =data.main.temp;
               $(".today").find(".temp").text(todayTemp);
               var todayWind = data.wind.speed;
               $(".today").find(".wind").text(todayWind);
               var todayHumidity = data.main.humidity;
               $(".today").find(".humidity").text(todayHumidity);
-              var todayIcon=data.weather[0];
-              
               coord=data.coord;
+              $("#city").val("");
        
         GetTodayUV();
         fiveDayForcast();
@@ -43,12 +43,19 @@ var GetTodayUV = function(){
        if (response.ok) {
           response.json().then(function(data){
               var todayUV = data.current.uvi;
+              
               $(".today").find(".uv").text(todayUV);
               if(todayUV<=2){
-                $(".today").find(".uv").addClass("bg-success p-2 text-white");
+                $(".today").find(".uv").removeClass("bg-warning bg-danger");
+                $(".today").find(".uv").addClass("bg-success px-2 py-1 text-white rounded");
               }
-              else if (todayUV>2 && todayUV<) {
-                  
+              else if (todayUV>2 && todayUV<=4) {
+                $(".today").find(".uv").removeClass("bg-success bg-danger");  
+                $(".today").find(".uv").addClass("bg-warning px-2 py-1 text-white rounded");
+              }
+              else {
+                $(".today").find(".uv").removeClass("bg-success bg-warning");
+                $(".today").find(".uv").addClass("bg-danger px-2 py-1 rounded");
               }
         return todayUV;
        }); 
