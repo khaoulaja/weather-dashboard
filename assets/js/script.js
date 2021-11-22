@@ -3,16 +3,18 @@ var searchedCities =[];
 var coord;
 var key="&appid=699b48e686b0ad4a16a412dc0fed1a03";
 
-var GetForcast = function(event){
+var formHandler =function(event){
     event.preventDefault();
     city =$("#city").val().trim();
-    
+    GetForcast();
+}
+ var GetForcast = function(){   
    var apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=";
    var response = fetch(apiUrl +city +"&units=imperial" +key).then(function(response){
        if (response.ok) {
             response.json().then(function(data){
                 
-                var todayDate=new Date( Date(data.dt));
+                var todayDate=new Date( Date(data.dt));console.log(data);
                 var formatedDate = "("+todayDate.getMonth()+'/' +todayDate.getDate()+'/'+todayDate.getFullYear()+")";
                 $(".searched-city").text(city +" "+formatedDate);
                 $(".today").find(".icon").attr("src","https://openweathermap.org/img/wn/"+data.weather[0].icon+".png")
@@ -45,6 +47,7 @@ var GetTodayUV = function(){
     var response = fetch(apiUrl+coord.lat+"&lon="+coord.lon+"&units=imperial" +key).then(function(response){
        if (response.ok) {
           response.json().then(function(data){
+              console.log(data);
               var todayUV = data.current.uvi;
               
               $(".today").find(".uv").text(todayUV);
@@ -100,27 +103,29 @@ var fiveDayForcast=function(){
           alert("Unable to connect to OpenWeatherMap");
       });
 };
-var result ;
+
 var saveCities =function (){
    //result =searchedCities.find(element =>city);
        if (!searchedCities.includes(city)) {
            searchedCities.push(city);
-           var btnEl = $("<button>").addClass("btn btn-outline-secondary fs-5 w-100 my-3").text(city);
+           var btnEl = $("<button>").addClass("btn btn-outline-secondary fs-5 w-100 my-3 text-capitalize").text(city);
+           $("#saved-cities").removeClass("d-none");
            $("#saved-cities").append(btnEl);
+           
         }
     localStorage.setItem("cities",JSON.stringify(searchedCities));
     
 }
 var getCities = function(){
     searchedCities = JSON.parse(localStorage.getItem("cities"));
-    if (searchedCities==undefined) {
+    
+    if (!searchedCities) {
         searchedCities = [];
     }
     else{
         $("#saved-cities").removeClass("d-none");
         for (let i = 0; i < searchedCities.length; i++) {
-            
-            var btnEl = $("<button>").addClass("btn btn-outline-secondary fs-5 w-100 my-3").text(searchedCities[i]);
+            var btnEl = $("<button>").addClass("btn btn-outline-secondary fs-5 w-100 my-3 text-capitalize").text(searchedCities[i]);
             $("#saved-cities").append(btnEl);
             
         }
@@ -128,7 +133,7 @@ var getCities = function(){
     //console.log(arr);
 }
 getCities();
-document.querySelector("#forcast-form").addEventListener("submit",GetForcast);
+document.querySelector("#forcast-form").addEventListener("submit",formHandler);
 $("#saved-cities").on("click","button",function(){
     city = $(this).text().trim();
     GetForcast();
